@@ -24,6 +24,7 @@ class CustomerTest(unittest.TestCase):
 		pass
 	
 	def test_statement(self):
+		"""Test the statement method"""
 		stmt = self.c.statement()
 		# visual testing
 		print(stmt)
@@ -38,3 +39,14 @@ class CustomerTest(unittest.TestCase):
 		matches = re.match(pattern, stmt.replace('\n',''), flags=re.DOTALL)
 		self.assertIsNotNone(matches)
 		self.assertEqual("12.00", matches[1])
+
+	def test_customer_method(self):
+		"""Test method in customer class"""
+		eiei = Customer("eiei")
+		self.assertEqual("eiei",eiei.get_name())
+		eiei.add_rental(Rental(Movie("UmuUmu", Movie.NEW_RELEASE), 5))
+		self.assertEqual(eiei.all_frequent_points(), 5)
+		self.assertEqual(eiei.all_amount(), 15)
+
+if __name__ == "__main__":
+	unittest.main()

@@ -15,10 +15,12 @@ class Customer:
         self.rentals = []
 
     def add_rental(self, rental: Rental):
+        """add movie rental"""
         if rental not in self.rentals:
             self.rentals.append(rental)
     
     def get_name(self):
+        """get name of customer"""
         return self.name
     
     def statement(self):
@@ -27,50 +29,38 @@ class Customer:
             along with total charges and reward points.
             Returns:
                 the statement as a String
-        """
-        total_amount = 0 # total charges
-        frequent_renter_points = 0 
+        """ 
         statement = f"Rental Report for {self.name}\n\n"
         fmt = "{:32s}    {:4s} {:6s}\n"
         statement += fmt.format("Movie Title", "Days", "Price")
         fmt = "{:32s}   {:4d} {:6.2f}\n"
         
-        for rental in self.rentals:
-            # compute rental change
-            amount = 0
-            if rental.get_movie().get_price_code() == Movie.REGULAR:
-                # Two days for $2, additional days 1.50 each.
-                amount = 2.0
-                if rental.get_days_rented() > 2:
-                    amount += 1.5*(rental.get_days_rented()-2)
-            elif rental.get_movie().get_price_code() == Movie.CHILDRENS:
-                # Three days for $1.50, additional days 1.50 each.
-                amount = 1.5
-                if rental.get_days_rented() > 3:
-                    amount += 1.5*(rental.get_days_rented()-3)
-            elif rental.get_movie().get_price_code() == Movie.NEW_RELEASE:
-                # Straight per day charge
-                amount = 3*rental.get_days_rented()
-            else:
-                log = logging.getLogger()
-                log.error(f"Movie {rental.get_movie()} has unrecognized priceCode {rental.get_movie().get_price_code()}")
-            # award renter points
-            if rental.get_movie().get_price_code() == Movie.NEW_RELEASE:
-                frequent_renter_points += rental.get_days_rented()
-            else:
-                frequent_renter_points += 1
+        for rental in self.rentals:   
             #  add detail line to statement
-            statement += fmt.format(rental.get_movie().get_title(), rental.get_days_rented(), amount)
+            statement += fmt.format(rental.get_movie().get_title(), rental.get_days_rented(), rental.get_price())
             # and accumulate activity
-            total_amount += amount
 
         # footer: summary of charges
         statement += "\n"
         statement += "{:32s} {:6s} {:6.2f}\n".format(
-                       "Total Charges", "", total_amount)
-        statement += "Frequent Renter Points earned: {}\n".format(frequent_renter_points)
+                       "Total Charges", "", self.all_amount())
+        statement += "Frequent Renter Points earned: {}\n".format(self.all_frequent_points())
 
         return statement
+    
+    def all_frequent_points(self):
+        """calculate tota' frequent points"""
+        frequent_renter_points = 0
+        for rental in self.rentals:   
+            frequent_renter_points += rental.get_frequent_point()
+        return frequent_renter_points
+
+    def all_amount(self):
+        """calculate total prices"""
+        total_amount = 0
+        for rental in self.rentals:   
+            total_amount += rental.get_price()
+        return total_amount
 
 if __name__ == "__main__":
     customer = Customer("Edward Snowden")
