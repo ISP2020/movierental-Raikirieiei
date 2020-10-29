@@ -1,5 +1,6 @@
-from movie import Movie
+
 import logging
+from pricecode import PriceCode
 class Rental:
 	"""
 	A rental of a movie by customer.
@@ -12,25 +13,28 @@ class Rental:
 	field is used.
 	"""
 	
+
 	def __init__(self, movie, days_rented): 
 		"""Initialize a new movie rental object for
 		   a movie with known rental period (daysRented).
 		"""
-		self.movie = movie
+		self.price_code = PriceCode.set_price_code(movie)
+		self.__movie = movie
 		self.days_rented = days_rented
-
-	def get_movie(self):
-		"""get the rented movie"""
-		return self.movie
 
 	def get_days_rented(self):
 		"""get renteds day"""
 		return self.days_rented
 
-	def get_frequent_point(self):
+	def get_frequent_point(self, day_rent):
 		"""get the frequent point """
-		return self.get_movie().get_frequent_point(self.get_days_rented())
+		return self.price_code.frequent(day_rent)
 	
-	def get_price(self):
+	def get_price(self, day_rent):
 		"""get the price"""
-		return self.get_movie().get_price(self.get_days_rented())
+		return self.price_code.price(day_rent)
+	
+	def get_title(self):
+		return self.__movie.get_title()
+	
+	

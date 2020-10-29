@@ -1,7 +1,8 @@
 from rental import Rental
 from movie import Movie
 import logging
-
+from pricecode import PriceCode
+from movie_catalog import MovieCatalog
 class Customer:
     """
        A customer who rents movies.
@@ -37,36 +38,40 @@ class Customer:
         
         for rental in self.rentals:   
             #  add detail line to statement
-            statement += fmt.format(rental.get_movie().get_title(), rental.get_days_rented(), rental.get_price())
+            statement += fmt.format(rental.get_title(), rental.get_days_rented(), rental.get_price(rental.get_days_rented()))
             # and accumulate activity
 
         # footer: summary of charges
         statement += "\n"
         statement += "{:32s} {:6s} {:6.2f}\n".format(
-                       "Total Charges", "", self.all_amount())
-        statement += "Frequent Renter Points earned: {}\n".format(self.all_frequent_points())
+                       "Total Charges", "", self.get_total_amount())
+        statement += "Frequent Renter Points earned: {}\n".format(self.get_total_frequent_points())
 
         return statement
     
-    def all_frequent_points(self):
+    def get_total_frequent_points(self):
         """calculate tota' frequent points"""
         frequent_renter_points = 0
         for rental in self.rentals:   
-            frequent_renter_points += rental.get_frequent_point()
+            frequent_renter_points += rental.get_frequent_point(rental.get_days_rented())
         return frequent_renter_points
 
-    def all_amount(self):
+    def get_total_amount(self):
         """calculate total prices"""
         total_amount = 0
         for rental in self.rentals:   
-            total_amount += rental.get_price()
+            total_amount += rental.get_price(rental.get_days_rented())
         return total_amount
 
 if __name__ == "__main__":
+    
     customer = Customer("Edward Snowden")
-    print(customer.statement())
-    movie = Movie("Hacker Noon", Movie.REGULAR,2000,"Fantasy")
-    customer.add_rental(Rental(movie, 2))
-    movie = Movie("CitizenFour", Movie.NEW_RELEASE,2000,"Fantasy")
+    catalog = MovieCatalog()
+    movie = catalog.get_movie("The Legend of Sarila") #children
+    movie2 = catalog.get_movie("Mulan") #new release
+    movie3 = catalog.get_movie("Deadpool") #normal
     customer.add_rental(Rental(movie, 3))
+    customer.add_rental(Rental(movie2, 3))
+    customer.add_rental(Rental(movie3, 3))
+    print()
     print(customer.statement())
